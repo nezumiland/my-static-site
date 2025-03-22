@@ -1,12 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Static Site</title>
+    <title>日付・曜日・時間帯</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            font-size: 5vw;
+            font-weight: bold;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        .section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+        }
+        @media (orientation: portrait) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        @media (orientation: landscape) {
+            .container {
+                flex-direction: row;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Static Site</h1>
-    <p>Hello World!</p>
+    <div class="container">
+        <div class="section" id="date"></div>
+        <div class="section" id="day"></div>
+        <div class="section" id="time-slot"></div>
+    </div>
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const hours = now.getHours();
+            let timeSlot;
+            if (hours >= 5 && hours < 11) {
+                timeSlot = '朝';
+            } else if (hours >= 11 && hours < 17) {
+                timeSlot = '昼';
+            } else if (hours >= 17 && hours < 20) {
+                timeSlot = '夕';
+            } else {
+                timeSlot = '夜';
+            }
+            document.getElementById('date').textContent = now.getDate();
+            document.getElementById('day').textContent = days[now.getDay()];
+            document.getElementById('time-slot').textContent = timeSlot;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+    </script>
 </body>
 </html>
