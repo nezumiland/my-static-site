@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日付・曜日・時間帯表示</title>
+    <title>日付・曜日・時間帯</title>
     <style>
         body {
             margin: 0;
             display: flex;
-            font-family: "MS Gothic", monospace;
+            font-family: 'MS Gothic', sans-serif;
             text-align: center;
             justify-content: center;
             align-items: center;
@@ -16,60 +16,77 @@
         }
         .container {
             display: flex;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
         }
-        .section {
+        .box {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-grow: 1;
-            border: 1px solid black;
+            border: 1px solid #000;
+        }
+        .date {
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
     <div class="container" id="container">
-        <div class="section" id="date"></div>
-        <div class="section" id="day"></div>
-        <div class="section" id="time"></div>
+        <div class="box" id="dateBox"></div>
+        <div class="box" id="dayBox"></div>
+        <div class="box" id="timeBox"></div>
     </div>
     <script>
-        function updateDisplay() {
+        function updateLayout() {
+            const container = document.getElementById("container");
+            if (window.innerWidth > window.innerHeight) {
+                container.style.flexDirection = "row";
+            } else {
+                container.style.flexDirection = "column";
+            }
+        }
+        
+        function updateDateTime() {
             const now = new Date();
             const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
-            const day = dayNames[now.getDay()];
-            const hour = now.getHours();
-            let timeZone;
-            if (hour < 6) timeZone = "夜";
-            else if (hour < 12) timeZone = "朝";
-            else if (hour < 18) timeZone = "昼";
-            else timeZone = "夕";
-
-            document.getElementById("date").innerHTML = `<span style="font-size: 80%;">${month}月${date}日</span>`;
-            document.getElementById("day").innerHTML = `<span>${day}</span>`;
-            document.getElementById("time").innerHTML = `<span>${timeZone}</span>`;
-            adjustLayout();
-        }
-        
-        function adjustLayout() {
-            const container = document.getElementById("container");
-            const isVertical = window.innerHeight > window.innerWidth;
-            container.style.flexDirection = isVertical ? "column" : "row";
+            const day = now.getDate();
+            const weekDay = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+            const hours = now.getHours();
+            let timePeriod = "";
+            if (hours < 6) timePeriod = "夜";
+            else if (hours < 12) timePeriod = "朝";
+            else if (hours < 18) timePeriod = "昼";
+            else timePeriod = "夕";
             
-            document.querySelectorAll(".section").forEach(section => {
-                const width = section.clientWidth;
-                const height = section.clientHeight;
-                const fontSize = Math.min(width, height) * 0.8;
-                section.firstChild.style.fontSize = fontSize + "px";
-            });
+            const dateBox = document.getElementById("dateBox");
+            const dayBox = document.getElementById("dayBox");
+            const timeBox = document.getElementById("timeBox");
+            
+            dateBox.innerHTML = `<div class="date"><div style="font-size: 20%">${month}月</div><div style="font-size: 20%">${day}日</div></div>`;
+            dayBox.innerHTML = `<div style="font-size: 80%">${weekDay}</div>`;
+            timeBox.innerHTML = `<div style="font-size: 80%">${timePeriod}</div>`;
+            
+            adjustFontSize(dateBox, 20);
+            adjustFontSize(dayBox, 80);
+            adjustFontSize(timeBox, 80);
         }
         
-        window.onload = updateDisplay;
-        window.onresize = adjustLayout;
-        setInterval(updateDisplay, 1000 * 60);
+        function adjustFontSize(element, sizePercentage) {
+            const boxWidth = element.clientWidth;
+            const boxHeight = element.clientHeight;
+            const minSize = Math.min(boxWidth, boxHeight) * (sizePercentage / 100);
+            element.style.fontSize = `${minSize}px`;
+        }
+        
+        window.onload = () => {
+            updateLayout();
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+        };
+        
+        window.onresize = updateLayout;
     </script>
 </body>
 </html>
