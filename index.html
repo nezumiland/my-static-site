@@ -9,9 +9,9 @@
         html, body { width: 100%; height: 100%; display: flex; }
         .container { display: flex; width: 100%; height: 100%; }
         .box { display: flex; align-items: center; justify-content: center; flex: 1; }
-        .date { font-size: 8vw; }
-        .day { font-size: 20vw; font-weight: bold; }
-        .time { font-size: 50vw; font-weight: bold; font-family: "MS ゴシック", "MS Gothic", sans-serif; }
+        .date { font-size: 15vw; }
+        .day { font-size: 30vw; font-weight: bold; font-family: "MS ゴシック", "MS Gothic", sans-serif; }
+        .time { font-size: 30vw; font-weight: bold; font-family: "MS ゴシック", "MS Gothic", sans-serif; }
     </style>
 </head>
 <body>
@@ -25,7 +25,7 @@
             const now = new Date();
             const month = now.getMonth() + 1;
             const day = now.getDate();
-            document.getElementById("date").innerHTML = `<span style="font-size:1.5em">${month}</span>月<span style="font-size:1.5em">${day}</span>日`;
+            document.getElementById("date").innerHTML = `<span style="font-size:1.5em">${month}</span>月<br><span style="font-size:1.5em">${day}</span>日`;
             
             const days = ["日", "月", "火", "水", "木", "金", "土"];
             document.getElementById("day").textContent = days[now.getDay()];
