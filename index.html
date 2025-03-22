@@ -3,90 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日付・曜日・時間帯</title>
+    <title>日付・曜日・時間帯表示</title>
     <style>
         body {
             margin: 0;
             display: flex;
-            font-family: 'MS Gothic', sans-serif;
-            text-align: center;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            display: flex;
+            flex-direction: column;
             width: 100vw;
             height: 100vh;
+            font-family: 'MS Gothic', sans-serif;
+            text-align: center;
         }
-        .box {
+        .section {
             display: flex;
-            justify-content: center;
             align-items: center;
-            flex-grow: 1;
-            border: 1px solid #000;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+            height: 100%;
         }
-        .date {
-            display: flex;
-            flex-direction: column;
+        .date-container span {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="container">
-        <div class="box" id="dateBox"></div>
-        <div class="box" id="dayBox"></div>
-        <div class="box" id="timeBox"></div>
-    </div>
+    <div class="section" id="date"></div>
+    <div class="section" id="weekday"></div>
+    <div class="section" id="time-period"></div>
+
     <script>
-        function updateLayout() {
-            const container = document.getElementById("container");
-            if (window.innerWidth > window.innerHeight) {
-                container.style.flexDirection = "row";
-            } else {
-                container.style.flexDirection = "column";
-            }
-        }
-        
-        function updateDateTime() {
+        function updateDisplay() {
             const now = new Date();
             const month = now.getMonth() + 1;
-            const day = now.getDate();
-            const weekDay = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+            const date = now.getDate();
+            const day = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
             const hours = now.getHours();
-            let timePeriod = "";
-            if (hours < 6) timePeriod = "夜";
-            else if (hours < 12) timePeriod = "朝";
-            else if (hours < 18) timePeriod = "昼";
-            else timePeriod = "夕";
             
-            const dateBox = document.getElementById("dateBox");
-            const dayBox = document.getElementById("dayBox");
-            const timeBox = document.getElementById("timeBox");
+            let period;
+            if (hours < 6) period = '夜';
+            else if (hours < 12) period = '朝';
+            else if (hours < 18) period = '昼';
+            else period = '夕';
             
-            dateBox.innerHTML = `<div class="date"><div style="font-size: 20%">${month}月</div><div style="font-size: 20%">${day}日</div></div>`;
-            dayBox.innerHTML = `<div style="font-size: 80%">${weekDay}</div>`;
-            timeBox.innerHTML = `<div style="font-size: 80%">${timePeriod}</div>`;
+            document.getElementById('date').innerHTML = `<div class="date-container"><span style="font-size: 50%">${month}月</span><span>${date}日</span></div>`;
+            document.getElementById('weekday').textContent = day;
+            document.getElementById('time-period').textContent = period;
             
-            adjustFontSize(dateBox, 20);
-            adjustFontSize(dayBox, 80);
-            adjustFontSize(timeBox, 80);
+            adjustLayout();
         }
         
-        function adjustFontSize(element, sizePercentage) {
-            const boxWidth = element.clientWidth;
-            const boxHeight = element.clientHeight;
-            const minSize = Math.min(boxWidth, boxHeight) * (sizePercentage / 100);
-            element.style.fontSize = `${minSize}px`;
+        function adjustLayout() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            document.body.style.flexDirection = isLandscape ? 'row' : 'column';
+            adjustFontSize();
         }
         
-        window.onload = () => {
-            updateLayout();
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-        };
+        function adjustFontSize() {
+            document.querySelectorAll('.section').forEach(section => {
+                const parent = section;
+                const text = section.firstChild;
+                let fontSize = 10;
+                text.style.fontSize = fontSize + 'px';
+                while (text.scrollWidth <= parent.clientWidth && text.scrollHeight <= parent.clientHeight) {
+                    fontSize++;
+                    text.style.fontSize = fontSize + 'px';
+                }
+                text.style.fontSize = (fontSize - 1) + 'px';
+            });
+        }
         
-        window.onresize = updateLayout;
+        window.addEventListener('resize', adjustLayout);
+        updateDisplay();
     </script>
 </body>
 </html>
