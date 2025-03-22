@@ -5,70 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日付・曜日・時間帯</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            font-size: 5vw;
-            font-weight: bold;
-            text-align: center;
-        }
-        .container {
-            display: flex;
-            flex: 1;
-        }
-        .section {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #000;
-        }
-        @media (orientation: portrait) {
-            .container {
-                flex-direction: column;
-            }
-        }
-        @media (orientation: landscape) {
-            .container {
-                flex-direction: row;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; display: flex; }
+        .container { display: flex; width: 100%; height: 100%; }
+        .box { display: flex; align-items: center; justify-content: center; flex: 1; }
+        .date { font-size: 8vw; }
+        .day { font-size: 20vw; font-weight: bold; }
+        .time { font-size: 15vw; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="section" id="date"></div>
-        <div class="section" id="day"></div>
-        <div class="section" id="time-slot"></div>
+    <div class="container" id="container">
+        <div class="box" id="dateBox"><span class="date" id="date"></span></div>
+        <div class="box" id="dayBox"><span class="day" id="day"></span></div>
+        <div class="box" id="timeBox"><span class="time" id="time"></span></div>
     </div>
     <script>
-        function updateDateTime() {
+        function updateTime() {
             const now = new Date();
-            const days = ['日', '月', '火', '水', '木', '金', '土'];
-            const hours = now.getHours();
-            let timeSlot;
-            if (hours >= 5 && hours < 11) {
-                timeSlot = '朝';
-            } else if (hours >= 11 && hours < 17) {
-                timeSlot = '昼';
-            } else if (hours >= 17 && hours < 20) {
-                timeSlot = '夕';
-            } else {
-                timeSlot = '夜';
-            }
-            document.getElementById('date').textContent = now.getDate();
-            document.getElementById('day').textContent = days[now.getDay()];
-            document.getElementById('time-slot').textContent = timeSlot;
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            document.getElementById("date").innerHTML = `<span style="font-size:1.5em">${month}</span>月<span style="font-size:1.5em">${day}</span>日`;
+            
+            const days = ["日", "月", "火", "水", "木", "金", "土"];
+            document.getElementById("day").textContent = days[now.getDay()];
+            
+            const hour = now.getHours();
+            let timeZone = "朝";
+            if (hour >= 11) timeZone = "昼";
+            if (hour >= 17) timeZone = "夕";
+            if (hour >= 20) timeZone = "夜";
+            document.getElementById("time").textContent = timeZone;
         }
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
+        
+        function adjustLayout() {
+            const container = document.getElementById("container");
+            if (window.innerWidth > window.innerHeight) {
+                container.style.flexDirection = "row";
+            } else {
+                container.style.flexDirection = "column";
+            }
+        }
+        
+        window.onload = () => { updateTime(); adjustLayout(); };
+        window.onresize = adjustLayout;
+        setInterval(updateTime, 60000);
     </script>
 </body>
 </html>
