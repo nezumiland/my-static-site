@@ -3,53 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日付・曜日・時間帯</title>
+    <title>日付・曜日・時間帯表示</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; display: flex; }
-        .container { display: flex; width: 100%; height: 100%; }
-        .box { display: flex; align-items: center; justify-content: center; flex: 1; }
-        .date { font-size: 15vw; }
-        .day { font-size: 30vw; font-weight: bold; font-family: "MS ゴシック", "MS Gothic", sans-serif; }
-        .time { font-size: 30vw; font-weight: bold; font-family: "MS ゴシック", "MS Gothic", sans-serif; }
+        body {
+            margin: 0;
+            display: flex;
+            font-family: "MS Gothic", monospace;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        .section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            border: 1px solid black;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="container">
-        <div class="box" id="dateBox"><span class="date" id="date"></span></div>
-        <div class="box" id="dayBox"><span class="day" id="day"></span></div>
-        <div class="box" id="timeBox"><span class="time" id="time"></span></div>
+        <div class="section" id="date"></div>
+        <div class="section" id="day"></div>
+        <div class="section" id="time"></div>
     </div>
     <script>
-        function updateTime() {
+        function updateDisplay() {
             const now = new Date();
             const month = now.getMonth() + 1;
-            const day = now.getDate();
-            document.getElementById("date").innerHTML = `<span style="font-size:1.5em">${month}</span>月<br><span style="font-size:1.5em">${day}</span>日`;
-            
-            const days = ["日", "月", "火", "水", "木", "金", "土"];
-            document.getElementById("day").textContent = days[now.getDay()];
-            
+            const date = now.getDate();
+            const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+            const day = dayNames[now.getDay()];
             const hour = now.getHours();
-            let timeZone = "朝";
-            if (hour >= 11) timeZone = "昼";
-            if (hour >= 17) timeZone = "夕";
-            if (hour >= 20) timeZone = "夜";
-            document.getElementById("time").textContent = timeZone;
+            let timeZone;
+            if (hour < 6) timeZone = "夜";
+            else if (hour < 12) timeZone = "朝";
+            else if (hour < 18) timeZone = "昼";
+            else timeZone = "夕";
+
+            document.getElementById("date").innerHTML = `<span style="font-size: 80%;">${month}月${date}日</span>`;
+            document.getElementById("day").innerHTML = `<span>${day}</span>`;
+            document.getElementById("time").innerHTML = `<span>${timeZone}</span>`;
+            adjustLayout();
         }
         
         function adjustLayout() {
             const container = document.getElementById("container");
-            if (window.innerWidth > window.innerHeight) {
-                container.style.flexDirection = "row";
-            } else {
-                container.style.flexDirection = "column";
-            }
+            const isVertical = window.innerHeight > window.innerWidth;
+            container.style.flexDirection = isVertical ? "column" : "row";
+            
+            document.querySelectorAll(".section").forEach(section => {
+                const width = section.clientWidth;
+                const height = section.clientHeight;
+                const fontSize = Math.min(width, height) * 0.8;
+                section.firstChild.style.fontSize = fontSize + "px";
+            });
         }
         
-        window.onload = () => { updateTime(); adjustLayout(); };
+        window.onload = updateDisplay;
         window.onresize = adjustLayout;
-        setInterval(updateTime, 60000);
+        setInterval(updateDisplay, 1000 * 60);
     </script>
 </body>
 </html>
