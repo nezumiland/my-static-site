@@ -2,69 +2,88 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日付・曜日・時間帯</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>日付・曜日・時間帯表示</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { display: flex; width: 100vw; height: 100vh; font-family: "MS Gothic", monospace; }
-        .container { display: flex; flex-grow: 1; }
-        .section { display: flex; justify-content: center; align-items: center; text-align: center; }
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'MS Gothic', sans-serif;
+            text-align: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow: hidden;
+        }
+        .section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+        .date-container span {
+            display: block;
+        }
     </style>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
+    <div class="section" id="date"></div>
+    <div class="section" id="weekday"></div>
+    <div class="section" id="time-period"></div>
+
     <script>
-        function updateLayout() {
-            const body = document.body;
-            body.innerHTML = ""; // クリア
-            
-            const isPortrait = window.innerHeight > window.innerWidth;
-            const container = document.createElement("div");
-            container.className = "container";
-            container.style.flexDirection = isPortrait ? "column" : "row";
-            
-            const dateDiv = document.createElement("div");
-            const dayDiv = document.createElement("div");
-            const timeDiv = document.createElement("div");
-            
-            [dateDiv, dayDiv, timeDiv].forEach(div => {
-                div.className = "section";
-                div.style.flex = "1";
-                div.style.border = "1px solid black";
-            });
-            
-            container.append(dateDiv, dayDiv, timeDiv);
-            body.appendChild(container);
-            
+        function updateDisplay() {
             const now = new Date();
-            const months = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
-            const days = ["日", "月", "火", "水", "木", "金", "土"];
-            const times = ["朝", "昼", "夕", "夜"];
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const day = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+            const hours = now.getHours();
             
-            const month = months[now.getMonth()];
-            const day = `${now.getDate()}日`;
-            const weekday = days[now.getDay()];
-            const hour = now.getHours();
-            const timePeriod = hour < 6 ? times[3] : hour < 12 ? times[0] : hour < 18 ? times[1] : times[2];
+            let period;
+            if (hours < 6) period = '夜';
+            else if (hours < 12) period = '朝';
+            else if (hours < 18) period = '昼';
+            else period = '夕';
             
-            dateDiv.innerHTML = `<div>${month}</div><div>${day}</div>`;
-            dayDiv.innerText = weekday;
-            timeDiv.innerText = timePeriod;
+            document.getElementById('date').innerHTML = `<div class="date-container"><span style="font-size: 50%">${month}月</span><span>${date}日</span></div>`;
+            document.getElementById('weekday').textContent = day;
+            document.getElementById('time-period').textContent = period;
             
-            // 文字サイズ計算
-            [dateDiv, dayDiv, timeDiv].forEach(div => {
-                const rect = div.getBoundingClientRect();
-                const baseSize = Math.min(rect.width, rect.height) * 0.6;
-                div.style.fontSize = `${baseSize}px`;
-                
-                if (div === dateDiv) {
-                    div.children[0].style.fontSize = `${baseSize * 0.5}px`;
-                    div.children[1].style.fontSize = `${baseSize * 0.5}px`;
+            adjustLayout();
+        }
+        
+        function adjustLayout() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            document.body.style.flexDirection = isLandscape ? 'row' : 'column';
+            adjustFontSize();
+        }
+        
+        function adjustFontSize() {
+            document.querySelectorAll('.section').forEach(section => {
+                const parent = section;
+                const text = section.firstChild;
+                let fontSize = 10;
+                text.style.fontSize = fontSize + 'px';
+                while (text.scrollWidth <= parent.clientWidth && text.scrollHeight <= parent.clientHeight) {
+                    fontSize++;
+                    text.style.fontSize = fontSize + 'px';
                 }
+                text.style.fontSize = (fontSize - 1) + 'px';
             });
         }
         
-        window.addEventListener("resize", updateLayout);
-        window.addEventListener("load", updateLayout);
+        window.addEventListener('resize', adjustLayout);
+        updateDisplay();
     </script>
 </body>
 </html>
