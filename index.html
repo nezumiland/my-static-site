@@ -55,9 +55,14 @@
             else if (hours < 18) period = '昼';
             else period = '夕';
             
-            document.getElementById('date').innerHTML = `<div class="date-container"><span style="font-size: 50%">${month}月</span><span>${date}日</span></div>`;
-            document.getElementById('weekday').textContent = day;
-            document.getElementById('time-period').textContent = period;
+            document.getElementById('date').innerHTML = `
+                <div class="date-container">
+                    <span class="month">${month}月</span>
+                    <span class="day">${date}日</span>
+                </div>
+            `;
+            document.getElementById('weekday').innerHTML = `<span>${day}</span>`;
+            document.getElementById('time-period').innerHTML = `<span>${period}</span>`;
             
             adjustLayout();
         }
@@ -70,15 +75,27 @@
         
         function adjustFontSize() {
             document.querySelectorAll('.section').forEach(section => {
-                const parent = section;
-                const text = section.firstChild;
+                const textElement = section.querySelector("span");
+                if (!textElement) return;
+                
                 let fontSize = 10;
-                text.style.fontSize = fontSize + 'px';
-                while (text.scrollWidth <= parent.clientWidth && text.scrollHeight <= parent.clientHeight) {
+                textElement.style.fontSize = fontSize + 'px';
+
+                while (textElement.scrollWidth <= section.clientWidth && textElement.scrollHeight <= section.clientHeight) {
                     fontSize++;
-                    text.style.fontSize = fontSize + 'px';
+                    textElement.style.fontSize = fontSize + 'px';
                 }
-                text.style.fontSize = (fontSize - 1) + 'px';
+                textElement.style.fontSize = (fontSize - 1) + 'px';
+
+                // 「月」「日」のフォントサイズを数値の半分にする
+                if (section.id === 'date') {
+                    const monthSpan = section.querySelector('.month');
+                    const daySpan = section.querySelector('.day');
+                    if (monthSpan && daySpan) {
+                        const numericFontSize = parseInt(daySpan.style.fontSize);
+                        monthSpan.style.fontSize = (numericFontSize / 2) + 'px';
+                    }
+                }
             });
         }
         
